@@ -10,10 +10,18 @@ namespace Scripts.Gameplay.AI
         public float chargeSpeed = 10f;
         public float sChargeCooldown = 1f;
         public UnityEvent<GameObject> onChargeStart;
-        
-        
+        public float waitTime = 7f;
+
+
+
+        public float lastActionTime;
+        private bool isCharging = false;
+        public Vector2 homePosition;
+
+
+
         protected Rigidbody2D cachedRigidbody2D;
-        
+
         private float _sLastChargeTime = float.MinValue;
 
         private void Start()
@@ -22,21 +30,43 @@ namespace Scripts.Gameplay.AI
             if (!this.cachedRigidbody2D)
             {
                 Debug.LogWarning($"No Rigidbody2D found on {gameObject.name}.  Needed for {nameof(Charge)}");
+
+            }
+
+
+
+            Debug.Log("you're not getting past me!");
+
+            lastActionTime = Time.time;
+            homePosition = transform.position;
+        }
+
+        private void Update()
+        {
+            if (!isCharging)
+            {
+                if (Time.time >= lastActionTime + waitTime)
+                {
+                    Debug.Log("Going home");
+                    transform.position = homePosition;
+                    lastActionTime = Time.time;
+                }
             }
         }
 
         public void ChargeAt(GameObject target)
         {
             if (Time.time - this._sLastChargeTime < this.sChargeCooldown) return;
-            
+
             Vector2 direction = target.transform.position - transform.position;
             direction.Normalize();
-            
+            isCharging = true;
             // Use Impulse because this is a single instantaneous velocity change.  The parameter is expressed as a speed.
             this.cachedRigidbody2D.AddForce(direction * this.chargeSpeed * this.cachedRigidbody2D.mass, ForceMode2D.Impulse);
             this._sLastChargeTime = Time.time;
-            
+
             this.onChargeStart.Invoke(target);
+            isCharging = false;
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -49,7 +79,7 @@ namespace Scripts.Gameplay.AI
             MaybeCharge(other);
         }
 
-        
+
         private void MaybeCharge(Collider2D other)
         {
             if (GeneralHelpers.IsInMask(this.targetLayerMask, other.gameObject))
