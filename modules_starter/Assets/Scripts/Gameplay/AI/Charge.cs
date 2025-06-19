@@ -12,9 +12,15 @@ namespace Scripts.Gameplay.AI
         public UnityEvent<GameObject> onChargeStart;
         public float waitTime = 7f;
         
+<<<<<<< Updated upstream
         private float lastActionTime;
         private bool isCharging = false;
         private  Vector2 homePosition;
+=======
+        public float lastActionTime;
+        private bool isCharging = false;
+        public  Vector2 homePosition;
+>>>>>>> Stashed changes
         
         
         protected Rigidbody2D cachedRigidbody2D;
@@ -29,7 +35,11 @@ namespace Scripts.Gameplay.AI
                 Debug.LogWarning($"No Rigidbody2D found on {gameObject.name}.  Needed for {nameof(Charge)}");
                 
             }
+<<<<<<< Updated upstream
 
+=======
+            Debug.Log("you're not getting past me");
+>>>>>>> Stashed changes
             lastActionTime = Time.time;
             homePosition = transform.position;
         }
